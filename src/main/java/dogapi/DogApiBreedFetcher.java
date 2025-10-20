@@ -22,15 +22,11 @@ public class DogApiBreedFetcher implements BreedFetcher {
      *
      * @param breed the breed to fetch sub breeds for
      * @return list of sub breeds for the given breed
-     * @throws BreedNotFoundException if the breed does not exist (or if the API call fails for any reason)
+     * @throws IOException if a network error occurs
+     * @throws BreedNotFoundException if the breed does not exist or the API returns an error
      */
     @Override
-    public List<String> getSubBreeds(String breed) throws IOException {
-        // TODO Task 1: Complete this method based on its provided documentation
-        //      and the documentation for the dog.ceo API. You may find it helpful
-        //      to refer to the examples of using OkHttpClient from the last lab,
-        //      as well as the code for parsing JSON responses.
-        // return statement included so that the starter code can compile and run.
+    public List<String> getSubBreeds(String breed) throws IOException, BreedNotFoundException {
         String url = "https://dog.ceo/api/breed/" + breed + "/list";
         Request request = new Request.Builder()
                 .url(url)
@@ -38,20 +34,19 @@ public class DogApiBreedFetcher implements BreedFetcher {
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
                 throw new BreedNotFoundException(breed);
-            } else {
-                String responseBody = response.body().string();
-                JSONObject jsonObject = new JSONObject(responseBody);
-                String status = jsonObject.getString("status");
-                if (!"success".equals(status)) {
-                    throw new BreedNotFoundException(breed);
-                }
-                JSONArray messageArray = jsonObject.getJSONArray("message");
-                List<String> subBreeds = new ArrayList<>();
-                for (int i = 0; i < messageArray.length(); i++) {
-                    subBreeds.add(messageArray.getString(i));
-                }
-                return subBreeds;
             }
+            String responseBody = response.body().string();
+            JSONObject jsonObject = new JSONObject(responseBody);
+            String status = jsonObject.getString("status");
+            if (!"success".equals(status)) {
+                throw new BreedNotFoundException(breed);
+            }
+            JSONArray messageArray = jsonObject.getJSONArray("message");
+            List<String> subBreeds = new ArrayList<>();
+            for (int i = 0; i < messageArray.length(); i++) {
+                subBreeds.add(messageArray.getString(i));
+            }
+            return subBreeds;
         }
     }
 }
