@@ -13,7 +13,8 @@ public class DogApiBreedFetcher implements BreedFetcher {
     private final OkHttpClient client = new OkHttpClient();
 
     @Override
-    public List<String> getSubBreeds(String breed) throws BreedFetcher.BreedNotFoundException {
+    public List<String> getSubBreeds(String breed)
+            throws IOException, BreedFetcher.BreedNotFoundException {
         try {
             String url = "https://dog.ceo/api/breed/" + breed + "/list";
             Request request = new Request.Builder().url(url).build();
@@ -39,7 +40,6 @@ public class DogApiBreedFetcher implements BreedFetcher {
                 return subBreeds;
             }
         } catch (IOException e) {
-            // Catch IOException and wrap as BreedNotFoundException
             throw new BreedFetcher.BreedNotFoundException(breed);
         }
     }
