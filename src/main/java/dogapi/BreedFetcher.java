@@ -15,7 +15,7 @@ public interface BreedFetcher {
      * @throws IOException if an IO error occurs
      * @throws BreedNotFoundException if the breed does not exist
      */
-    List<String> getSubBreeds(String breed) throws IOException, BreedNotFoundException;
+    List<String> getSubBreeds(String breed) throws BreedNotFoundException;
 
     /**
      * Checked exception to indicate that a breed was not found.

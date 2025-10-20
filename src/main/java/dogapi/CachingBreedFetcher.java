@@ -33,8 +33,6 @@ public class CachingBreedFetcher implements BreedFetcher {
             // Do NOT cache not-found results
             callsMade++;
             throw e;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
