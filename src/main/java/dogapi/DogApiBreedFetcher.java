@@ -14,30 +14,33 @@ public class DogApiBreedFetcher implements BreedFetcher {
 
     @Override
     public List<String> getSubBreeds(String breed) throws BreedFetcher.BreedNotFoundException {
-        String url = "https://dog.ceo/api/breed/" + breed + "/list";
-        Request request = new Request.Builder().url(url).build();
+        try {
+            String url = "https://dog.ceo/api/breed/" + breed + "/list";
+            Request request = new Request.Builder().url(url).build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                throw new BreedNotFoundException(breed);
+            try (Response response = client.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    throw new BreedFetcher.BreedNotFoundException(breed);
+                }
+
+                String responseBody = response.body().string();
+                JSONObject jsonObject = new JSONObject(responseBody);
+
+                if (!"success".equals(jsonObject.getString("status"))) {
+                    throw new BreedFetcher.BreedNotFoundException(breed);
+                }
+
+                JSONArray messageArray = jsonObject.getJSONArray("message");
+                List<String> subBreeds = new ArrayList<>();
+                for (int i = 0; i < messageArray.length(); i++) {
+                    subBreeds.add(messageArray.getString(i));
+                }
+
+                return subBreeds;
             }
-
-            String responseBody = response.body().string();
-            JSONObject jsonObject = new JSONObject(responseBody);
-
-            if (!"success".equals(jsonObject.getString("status"))) {
-                throw new BreedNotFoundException(breed);
-            }
-
-            JSONArray messageArray = jsonObject.getJSONArray("message");
-            List<String> subBreeds = new ArrayList<>();
-            for (int i = 0; i < messageArray.length(); i++) {
-                subBreeds.add(messageArray.getString(i));
-            }
-
-            return subBreeds;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            // Catch IOException and wrap as BreedNotFoundException
+            throw new BreedFetcher.BreedNotFoundException(breed);
         }
     }
 }
