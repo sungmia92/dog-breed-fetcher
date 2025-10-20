@@ -7,7 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DogApiBreedFetcher implements BreedFetcher {
     private final OkHttpClient client = new OkHttpClient();
@@ -37,10 +38,10 @@ public class DogApiBreedFetcher implements BreedFetcher {
 
             return subBreeds;
         } catch (IOException e) {
-            // Wrap IOException as BreedNotFoundException so test doesn't see IOException
+            // Convert network errors into BreedNotFoundException
             throw new BreedFetcher.BreedNotFoundException(breed);
         } catch (Exception e) {
-            // Any unexpected JSON or runtime error
+            // Convert any parsing or runtime issues too
             throw new BreedFetcher.BreedNotFoundException(breed);
         }
     }
